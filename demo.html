@@ -1,0 +1,29 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <script src="availdate.js"></script>
+</head>
+<body>
+    <form id="frm" action="">
+        <span></span>
+        <input type="text" value="dddd" data-rule="s1-5" />
+        哈哈哈
+        <select>
+            <option value="哈哈哈2" selected>哈哈哈2</option>
+        </select>
+    </form>
+    <script type="text/javascript">
+        window.onload = function () {
+            ac.form({
+                area: "#frm",
+                call: function (e) {
+                    alert("验证出错了");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
