@@ -9,7 +9,7 @@
 <body>
     <form id="frm" action="">
         <span></span>
-        <input type="text" value="dddd" data-rule="s1-5" />
+        <input type="text" value="abc" data-rule="abc" />
         哈哈哈
         <select>
             <option value="哈哈哈2" selected>哈哈哈2</option>
@@ -17,6 +17,9 @@
     </form>
     <script type="text/javascript">
         window.onload = function () {
+            ac.rules({
+                "abc": /^abc$/
+            });
             ac.form({
                 area: "#frm",
                 call: function (e) {
