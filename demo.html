@@ -8,23 +8,15 @@
 </head>
 <body>
     <form id="frm" action="">
-        <span></span>
-        <input type="text" value="abc" data-rule="abc" />
-        哈哈哈
-        <select>
-            <option value="哈哈哈2" selected>哈哈哈2</option>
-        </select>
+        <input type="text" value="" data-rule="s2-7" data-nullmsg="不能为空" />
+        <input type="password" value="" data-rule="s2-7" data-nullmsg="不能为空" />
+        <input type="button" id="btns" value="哈哈哈" />
     </form>
     <script type="text/javascript">
         window.onload = function () {
-            ac.rules({
-                "abc": /^abc$/
-            });
             ac.form({
                 area: "#frm",
-                call: function (e) {
-                    alert("验证出错了");
-                }
+                btn: "#btns"
             });
         }
     </script>
