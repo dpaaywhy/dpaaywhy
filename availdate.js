@@ -79,11 +79,11 @@
         },
         tip: {
             "*": "不能为空！",
-            "*6-16": "请填写6到16位任意字符！",
+            "*6-16": "请填写$1到$2位任意字符！",
             "n": "请填写数字！",
-            "n6-16": "请填写6到16位数字！",
+            "n6-16": "请填写$1到$2位数字！",
             "s": "不能输入特殊字符！",
-            "s6-18": "请填写6到18位字符！",
+            "s6-16": "请填写$1到$2位字符！",
             "p": "请填写邮政编码！",
             "m": "请填写手机号码！",
             "e": "邮箱地址格式不对！",
@@ -259,19 +259,27 @@
                 } else {
                     // 2、判断是否和预定义匹配符匹配
                     if (/^.[0-9]+\-[0-9]+$/.test(_rule)) {
+                        var _f = _rule.substr(0, 1);
                         var _temp = _rule.substr(1, _rule.length - 1);
                         var _range = _temp.split("-");
                         if (parseInt(_range[0]) < parseInt(_range[1])) {
-                            var _r = initObj.rules[_rule.substr(0, 1)].toString().replace("$/", "{" + _range[0] + "," + _range[1] + "}$/").replace("+", "");
-                            var _rex = eval(_r);
-                            if (!_rex.test(_value)) {
-                                that.config.singleError(node, _errmsg == false ? "验证失败" : _errmsg);
-                                node.focus();
-                                that.isSuccess = that.isSuccess && false;
-                                return;
+
+                            if (initObj.rules[_f]) {
+                                var _r = initObj.rules[_f].toString().replace("$/", "{" + _range[0] + "," + _range[1] + "}$/").replace("+", "");
+                                var _rex = eval(_r);
+                                if (!_rex.test(_value)) {
+                                    that.config.singleError(node, _errmsg == false ? (initObj.tip[_f + "6-16"].replace("$1", _range[0]).replace("$2", _range[1])) : _errmsg);
+                                    node.focus();
+                                    that.isSuccess = that.isSuccess && false;
+                                    return;
+                                }
+                                else {
+                                    that.config.singleSuccess(node, _sucmsgg == false ? "验证成功" : _sucmsgg);
+                                    that.isSuccess = that.isSuccess || true;
+                                }
                             }
                             else {
-                                that.config.singleSuccess(node, _sucmsgg == false ? "验证成功" : _sucmsgg);
+                                console.warn("没有以" + _f + "开头的标识符！已跳过验证！");
                                 that.isSuccess = that.isSuccess || true;
                             }
                         }
