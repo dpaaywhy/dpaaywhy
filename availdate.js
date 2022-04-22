@@ -309,7 +309,6 @@
     // 单选按钮的验证
     Winu.prototype.radio = function (node) {
         var that = this;
-
     };
 
     // 复选按钮的验证
@@ -322,6 +321,11 @@
         var that = this;
 
     };
+    // 拓展规则
+    Winu.prototype.extRule = function (rule) {
+        var that = this;
+        initObj.rules = base.extend(initObj.rules, rule);
+    }
 
     Winu.prototype.core = function (node) {
         var that = this;
@@ -340,6 +344,7 @@
         }
         else {
             _btn[0].addEventListener("click", function (e) {
+                that.isSuccess = true;
                 that.config.startCheck();
                 var areaFormEles = that.getFormNodes();
                 for (var i = 0; i < areaFormEles.length; i++) {
@@ -347,7 +352,6 @@
                         that.core(areaFormEles[i]);
                     }
                     else {
-                        that.isSuccess = true;
                         break;
                     }
                 }
@@ -361,6 +365,10 @@
     var ac = {};
     ac.form = function (options) {
         var o = new Winu(options || {});
+        return o;
+    }
+    ac.addRule = function (rule) {
+        Winu.prototype.extRule(rule);
     }
 
     win.ac = ac;
