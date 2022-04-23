@@ -213,6 +213,7 @@
         var _haved = base.getAttribute(node, initObj.tagAttr[5]);
 
         var _value = node.value;
+        var _name = base.getAttribute(node, "name");
 
         if (_rule) {
 
