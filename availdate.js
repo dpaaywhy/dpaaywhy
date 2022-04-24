@@ -215,8 +215,10 @@
         var _value = node.value;
         var _name = base.getAttribute(node, "name");
 
-        if (_rule) {
+        // 判断是否有同步属性
 
+
+        if (_rule) {
             // 1、判断是否是预定义正则表达式
             if (initObj.rules[_rule]) {
                 if (base.trim(_value) == "") {
