@@ -216,6 +216,18 @@
         var _name = base.getAttribute(node, "name");
 
         // 判断是否有同步属性
+        if (_sync && _sync != "") {
+            var _syncNode = S(node.nodeName.toLocaleLowerCase() + "[name='" + _sync + "']");
+            if (_syncNode.length > 0) {
+                _rule = base.getAttribute(_syncNode[0], initObj.tagAttr[0]);
+
+                _nullmsg = _nullmsg == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[1]) : _nullmsg;
+                _errmsg = _errmsg == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[2]) : _errmsg;
+                _sucmsgg = _sucmsgg == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[3]) : _sucmsgg;
+                _sync = _sync == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[4]) : _sync;
+                _haved = _haved == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[5]) : _haved;
+            }
+        }
 
 
         if (_rule) {
