@@ -135,6 +135,20 @@
             }
             return nodeType.toLocaleLowerCase() == "select";
         },
+        isRadio: function (node) {
+            var nodeType = "text";
+            if (base.getAttribute(node, "type")) {
+                nodeType = base.getAttribute(node, "type");
+            }
+            return nodeType.toLocaleLowerCase() == "radio";
+        },
+        isCheckbox: function (node) {
+            var nodeType = "text";
+            if (base.getAttribute(node, "type")) {
+                nodeType = base.getAttribute(node, "type");
+            }
+            return nodeType.toLocaleLowerCase() == "checkbox";
+        },
         trim: function (str) {
             return str.replace(/^\s+|\s+$/g, "")
         }
@@ -300,7 +314,7 @@
                         }
                         else {
                             console.warn("规则标识符数字范围前者应小于后者");
-                            that.isSuccess = that.isSuccess && false;
+                            that.isSuccess = that.isSuccess && true;
                         }
                     }
                     else {
@@ -321,14 +335,49 @@
         }
     };
 
-    // 单选按钮的验证
-    Winu.prototype.radio = function (node) {
+    // 单选按钮，复选按钮的验证
+    Winu.prototype.radioOrCheckbox = function (node) {
         var that = this;
-    };
 
-    // 复选按钮的验证
-    Winu.prototype.checkbox = function (node) {
-        var that = this;
+        var _rule = base.getAttribute(node, initObj.tagAttr[0]);
+        var _nullmsg = base.getAttribute(node, initObj.tagAttr[1]);
+        var _errmsg = base.getAttribute(node, initObj.tagAttr[2]);
+        var _sucmsgg = base.getAttribute(node, initObj.tagAttr[3]);
+
+        var _value = node.value;
+        var _name = base.getAttribute(node, "name");
+        var _type = base.getAttribute(node, "type");
+
+        if (_rule && _rule == "*") {
+            if (_name) {
+                var tag = false;
+                var radios = S("input[name='" + _name + "'][type='" + _type + "']");
+                for (var radio in radios) {
+                    if (radios[radio].checked) {
+                        tag = true;
+                        break;
+                    }
+                }
+                if (tag) {
+                    that.config.singleSuccess(node, _sucmsgg == false ? "验证成功" : _sucmsgg);
+                    that.isSuccess = that.isSuccess || true;
+                }
+                else {
+                    that.config.singleError(node, _nullmsg == false ? "必须选择！" : _nullmsg);
+                    node.focus();
+                    that.isSuccess = that.isSuccess && false;
+                    return;
+                }
+            }
+            else {
+                console.warn("radio的name属性不能为空！");
+                that.isSuccess = that.isSuccess && true;
+            }
+        }
+        else {
+            console.warn("规则标识符不正确，应使用 * 符号");
+            that.isSuccess = that.isSuccess && true;
+        }
     };
 
     // 下拉框的验证
@@ -342,10 +391,17 @@
         initObj.rules = base.extend(initObj.rules, rule);
     }
 
+    // 验证核心方法
     Winu.prototype.core = function (node) {
         var that = this;
-        if (base.isInputForm(node)) {
+        if (base.isInputForm(node) && !base.isRadioOrCheckBox(node)) {
             that.inputArea(node);
+        }
+        else if (base.isRadioOrCheckBox(node)) {
+            that.radioOrCheckbox(node);
+        }
+        else if (base.isSelectList(node)) {
+            that.select(node);
         }
     };
 
