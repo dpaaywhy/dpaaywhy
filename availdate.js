@@ -1,5 +1,5 @@
 ﻿/*!
- @Name：移动端表单验证插件
+ @Name：为APICloud表单验证而生，但不仅仅限于此！
  @Author：新生帝
  @Date：2015-11-06
  @Copyright：中山赢友网络科技有限公司
