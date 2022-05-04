@@ -1,11 +1,11 @@
 ﻿/*!
- @Name：为APICloud表单验证而生，但不仅仅限于此！
+ @Name：availdate.js
  @Author：新生帝
  @Date：2015-11-06
  @Copyright：中山赢友网络科技有限公司
  @官网：http://www.winu.net
  @License：Apache v2 License
-        
+ @Describe：为APICloud表单验证而生，但不仅仅限于此！      
  */
 
 ; !function (win) {
