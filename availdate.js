@@ -240,6 +240,20 @@
                 _sucmsgg = _sucmsgg == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[3]) : _sucmsgg;
                 _sync = _sync == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[4]) : _sync;
                 _haved = _haved == false ? base.getAttribute(_syncNode[0], initObj.tagAttr[5]) : _haved;
+
+                var _syncValue = _syncNode[0].value;
+
+                // 判断两次值是否一样
+                if (_syncValue != _value) {
+                    that.config.singleError(node, _errmsg == false ? "两次输入值不一样" : _errmsg);
+                    node.focus();
+                    that.isSuccess = that.isSuccess && false;
+                    return;
+                }
+                else {
+                    that.config.singleSuccess(node, _sucmsgg == false ? "验证成功" : _sucmsgg);
+                    that.isSuccess = that.isSuccess || true;
+                }
             }
         }
 

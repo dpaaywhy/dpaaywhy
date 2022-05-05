@@ -8,50 +8,6 @@
     <script src="availdate.js"></script>
 </head>
 <body>
-    <form id="frm">
-        // 必填验证
-        <input type="text" data-rule="*" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
 
-        // 3-10个字符
-        <input type="text" data-rule="*3-10" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 数字类型
-        <input type="text" data-rule="n" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 5-10位数字类型
-        <input type="text" data-rule="n5-10" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 字符串类型
-        <input type="text" data-rule="s" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 8-20位字符串
-        <input type="text" data-rule="s8-20" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 日期格式
-        <input type="text" data-rule="date" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 邮箱格式
-        <input type="text" data-rule="email" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 手机号码
-        <input type="text" data-rule="m" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 金额
-        <input type="text" data-rule="money" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        // 支持强大的正则表达式
-        <input type="text" data-rule="/\w+/" data-nullmsg="不填的时候弹出的提示" data-errmsg="验证出错弹出提示" data-sucmsg="验证成功弹出提示" />
-
-        <input type="button" id="btn" value="验证" />
-    </form>
-
-    <script>
-        window.onload = function () {
-            ac.form({
-                area: "#frm",    // 验证区域
-                btn: "#btn"  // 触发验证按钮
-            });
-        }
-    </script>
 </body>
 </html>
