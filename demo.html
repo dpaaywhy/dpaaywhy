@@ -9,5 +9,11 @@
 </head>
 <body>
 
+    <script type="text/javascript">
+        ac.addRule({
+            // 支持固话和手机的验证
+            "tm": /((15)\d{9})|((13)\d{9})|((18)\d{9})|(0[1-9]{2,3}\-?[1-9]{6,7})/i
+        });
+    </script>
 </body>
 </html>
