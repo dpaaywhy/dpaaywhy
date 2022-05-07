@@ -5,15 +5,26 @@
     <title></title>
     <meta charset="utf-8" />
     <!--引入插件-->
-    <script src="availdate.js"></script>
+    <script type="text/javascript" src="availdate.js"></script>
 </head>
 <body>
-
+    <form id="frm">
+        <h3>必填验证：data-rule="*"</h3>
+        姓名：   <input type="text" data-rule="*" data-nullmsg="姓名不能为空" data-errmsg="验证失败" data-sucmsg="" />
+        <h3>指定字符数：data-rule=*3-5"，标识只能输入3到5个字符</h3>
+        姓名2：   <input type="text" data-rule="*3-5" data-nullmsg="姓名2不能为空" data-errmsg="姓名2只能是3到5个字符" data-sucmsg="验证成功" />
+        <br />
+        <br />
+        <input type="button" id="btn" value="提交" />
+    </form>
     <script type="text/javascript">
-        ac.addRule({
-            // 支持固话和手机的验证
-            "tm": /((15)\d{9})|((13)\d{9})|((18)\d{9})|(0[1-9]{2,3}\-?[1-9]{6,7})/i
+
+        // 对，就这么简单就初始化了。
+        ac.form({
+            area: "#frm",   // 验证区域，支持标签，id，class，推荐使用id或者class
+            btn: "#btn"     // 触发验证的按钮或者元素，支持标签，id，class，推荐使用id或者class
         });
+
     </script>
 </body>
 </html>
