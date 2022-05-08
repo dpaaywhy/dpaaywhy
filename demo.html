@@ -11,8 +11,97 @@
     <form id="frm">
         <h3>必填验证：data-rule="*"</h3>
         姓名：   <input type="text" data-rule="*" data-nullmsg="姓名不能为空" data-errmsg="验证失败" data-sucmsg="" />
-        <h3>指定字符数：data-rule=*3-5"，标识只能输入3到5个字符</h3>
+
+
+
+        <h3>指定字符数：data-rule="*3-5"，标识只能输入3到5个字符</h3>
         姓名2：   <input type="text" data-rule="*3-5" data-nullmsg="姓名2不能为空" data-errmsg="姓名2只能是3到5个字符" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证正整数：data-rule="n"</h3>
+        年龄：   <input type="text" data-rule="n" data-nullmsg="年龄不能为空" data-errmsg="年龄只能是正整数" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证正整数：data-rule="n3-6"，只能输入3到6位正整数</h3>
+        个数：   <input type="text" data-rule="n3-6" data-nullmsg="个数不能为空" data-errmsg="只能输入3-6位正整数" data-sucmsg="验证成功" />
+
+
+
+        <h3>只能输入字符串，不能输入特殊字符：data-rule="s"</h3>
+        昵称：   <input type="text" data-rule="s" data-nullmsg="昵称不能为空" data-errmsg="昵称包含特殊字符" data-sucmsg="验证成功" />
+
+
+
+        <h3>只能输入字符串，不能输入特殊字符：data-rule="s3-6"，只能输入不包含特殊字符的字符串，并且在3到6个字符之间</h3>
+        昵称2：   <input type="text" data-rule="s3-6" data-nullmsg="昵称2不能为空" data-errmsg="昵称2验证失败，不能包含特殊字符，或者只能是3到6位" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证邮政编码：data-rule="p"</h3>
+        邮政编码：   <input type="text" data-rule="p" data-nullmsg="邮政编码不能为空" data-errmsg="你输入的不是一个正确的邮政编码" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证手机号码：data-rule="m"</h3>
+        手机号码：   <input type="text" data-rule="m" data-nullmsg="手机号码不能为空" data-errmsg="你输入的不是一个手机号码" data-sucmsg="验证成功" />
+
+
+        <h3>验证电子邮件：data-rule="e"</h3>
+        电子邮件：   <input type="text" data-rule="e" data-nullmsg="电子邮件不能为空" data-errmsg="你输入的不是一个电子邮件" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证是否是一个网址：data-rule="url"</h3>
+        网址：   <input type="text" data-rule="url" data-nullmsg="网址不能为空" data-errmsg="你输入的不是一个网址" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证是否是日期格式：data-rule="date"，支持各种格式的日期格式</h3>
+        出生日期：   <input type="text" data-rule="date" data-nullmsg="出生日期为空" data-errmsg="你输入的日期格式不正确" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证是否是中文：data-rule="zh"</h3>
+        中文名称：   <input type="text" data-rule="zh" data-nullmsg="中文名称不能为空" data-errmsg="你输入的不是一个全中文" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证是否是中文：data-rule="/^[\u4e00-\u9fa5]{3,6}$/"，只能输入3到6个中文名称，<font style="color:#f00">支持万能的正则表达式</font></h3>
+        中文名称：   <input type="text" data-rule="/^[\u4e00-\u9fa5]{3,6}$/" data-nullmsg="中文名称不能为空" data-errmsg="只能输入3到6个中文字" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证金钱格式：data-rule="money"</h3>
+        你的工资是多少：   <input type="text" data-rule="money" data-nullmsg="工资不能为空" data-errmsg="你输入的不是一个金钱格式" data-sucmsg="验证成功" />
+
+
+
+        <h3>验证数值类型：data-rule="num"，支持小数，整数</h3>
+        你的身高：   <input type="text" data-rule="num" data-nullmsg="身高不能为空" data-errmsg="你输入的不是一个数值类型" data-sucmsg="验证成功" />
+
+
+
+        <h3>你的性别：data-rule="*"</h3>
+        性别：   <input type="radio" name="gender" data-rule="*" data-nullmsg="必须选择一个性别" data-sucmsg="验证成功" value="男" /> 男<input type="radio" name="gender" data-rule="*" data-nullmsg="必须选择一个性别" data-sucmsg="验证成功" value="女" /> 女
+
+
+
+        <h3>你的兴趣爱好：data-rule="*"</h3>
+        性别：   <input type="checkbox" name="like" data-rule="*" data-nullmsg="至少选一个" data-sucmsg="验证成功" value="篮球" /> 篮球 <input type="checkbox" name="like" data-rule="*" data-nullmsg="至少选一个" data-sucmsg="验证成功" value="足球" /> 足球<input type="checkbox" name="like" data-rule="*" data-nullmsg="至少选一个" data-sucmsg="验证成功" value="羽毛球" /> 羽毛球
+
+
+
+        <h3>你是基佬吗？：data-rule="*"</h3>
+        是否基佬？：   <select data-rule="*">
+            <option value="">请选择</option>
+            <option value="是">是</option>
+            <option value="不是">不是</option>
+        </select>
+
+
+
         <br />
         <br />
         <input type="button" id="btn" value="提交" />

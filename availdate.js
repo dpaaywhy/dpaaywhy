@@ -129,11 +129,7 @@
             return initObj.noInputTextFormType.indexOf(nodeType) > -1;
         },
         isSelectList: function (node) {
-            var nodeType = "text";
-            if (base.getAttribute(node, "type")) {
-                nodeType = base.getAttribute(node, "type");
-            }
-            return nodeType.toLocaleLowerCase() == "select";
+            return node.nodeName.toLocaleLowerCase() == "select";
         },
         isRadio: function (node) {
             var nodeType = "text";
@@ -397,7 +393,26 @@
     // 下拉框的验证
     Winu.prototype.select = function (node) {
         var that = this;
+        var _rule = base.getAttribute(node, initObj.tagAttr[0]);
+        var _nullmsg = base.getAttribute(node, initObj.tagAttr[1]);
+        var _sucmsgg = base.getAttribute(node, initObj.tagAttr[3]);
 
+        if (_rule && _rule == "*") {
+            if (node.value == "") {
+                that.config.singleError(node, _nullmsg == false ? "必须选择！" : _nullmsg);
+                node.focus();
+                that.isSuccess = that.isSuccess && false;
+                return;
+            }
+            else {
+                that.config.singleSuccess(node, _sucmsgg == false ? "验证成功" : _sucmsgg);
+                that.isSuccess = that.isSuccess || true;
+            }
+        }
+        else {
+            console.warn("规则标识符不正确，应使用 * 符号");
+            that.isSuccess = that.isSuccess && true;
+        }
     };
     // 拓展规则
     Winu.prototype.extRule = function (rule) {
@@ -408,7 +423,7 @@
     // 验证核心方法
     Winu.prototype.core = function (node) {
         var that = this;
-        if (base.isInputForm(node) && !base.isRadioOrCheckBox(node)) {
+        if (base.isInputForm(node) && !base.isRadioOrCheckBox(node) && !base.isSelectList(node)) {
             that.inputArea(node);
         }
         else if (base.isRadioOrCheckBox(node)) {
