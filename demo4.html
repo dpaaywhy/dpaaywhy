@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <!--引入插件-->
+    <script type="text/javascript" src="availdate.js"></script>
+</head>
+<body>
+    <form id="frm">
+        <h3>验证两次输入密码是否一致：data-rule="s3-10"  ，注意是通过data-sync="需要同步验证的name值"，这时候必须指定name值了</h3>
+        密码一：   <input type="password" name="pwd" data-rule="s3-10" data-nullmsg="请输入密码" data-errmsg="你输入的密码不正确" data-sucmsg="" />
+        <br />
+        <h3>如果添加了data-sync属性，可以不写data-rule了。</h3>
+        密码二：   <input type="password" name="pwd2" data-nullmsg="请再次输入密码" data-errmsg="你两次输入密码不正确" data-sucmsg="" data-sync="pwd" />
+        <br />
+        <br />
+        <input type="button" id="btn" value="提交" />
+    </form>
+    <script type="text/javascript">
+
+        // 对，就这么简单就初始化了。
+        ac.form({
+            area: "#frm",   // 验证区域，支持标签，id，class，推荐使用id或者class
+            btn: "#btn",
+            endSuccess: function () {
+                alert("全部验证成功啦！！！！！！");
+            }
+        });
+
+    </script>
+</body>
+</html>

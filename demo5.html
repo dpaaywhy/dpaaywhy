@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <!--引入插件-->
+    <script type="text/javascript" src="availdate.js"></script>
+</head>
+<body>
+    <form id="frm">
+        <h3>必须输入3到6个字符：data-rule="*3-6"，如果添加了data-haved="true"之后，就不执行为空验证了，只有填写值的时候才执行验证</h3>
+        姓名：   <input type="text" data-rule="*3-6" data-nullmsg="姓名不能为空" data-errmsg="必须是3到6个字符" data-sucmsg="" data-haved="true" />
+
+        <br />
+        <br />
+        <input type="button" id="btn" value="提交" />
+    </form>
+    <script type="text/javascript">
+
+        // 对，就这么简单就初始化了。
+        ac.form({
+            area: "#frm",   // 验证区域，支持标签，id，class，推荐使用id或者class
+            btn: "#btn",
+            endSuccess: function () {
+                alert("全部验证成功啦！！！！！！");
+            }
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <meta charset="utf-8" />
+    <!--引入插件-->
+    <script type="text/javascript" src="availdate.js"></script>
+</head>
+<body>
+    <form id="frm">
+        <h3>手机或者固话：data-rule="tm"  我是自定义验证规则标识的，本来没有tm的标识，tm标识固话或者手机</h3>
+        手机或者固话：   <input type="text" data-rule="tm" data-nullmsg="手机或固话不能为空" data-errmsg="你输入的不是一个手机或者固话" data-sucmsg="" />
+
+        <br />
+        <br />
+        <input type="button" id="btn" value="提交" />
+    </form>
+    <script type="text/javascript">
+        // 自定义标识规则
+        ac.addRule({
+            "tm": /(^[0-9]{3,4}\-[0-9]{3,8}$)|(^[0-9]{3,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}13[0-9]{9}$)/
+        });
+
+        // 对，就这么简单就初始化了。
+        ac.form({
+            area: "#frm",   // 验证区域，支持标签，id，class，推荐使用id或者class
+            btn: "#btn",
+            endSuccess: function () {
+                alert("全部验证成功啦！！！！！！");
+            }
+        });
+
+    </script>
+</body>
+</html>

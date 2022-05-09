@@ -240,16 +240,25 @@
                 var _syncValue = _syncNode[0].value;
 
                 // 判断两次值是否一样
-                if (_syncValue != _value) {
-                    that.config.singleError(node, _errmsg == false ? "两次输入值不一样" : _errmsg);
+                if (base.trim(_value) == "") {
+                    that.config.singleError(node, _nullmsg == false ? initObj.tip[_rule] : _nullmsg);
                     node.focus();
                     that.isSuccess = that.isSuccess && false;
                     return;
                 }
                 else {
-                    that.config.singleSuccess(node, _sucmsgg == false ? "验证成功" : _sucmsgg);
-                    that.isSuccess = that.isSuccess || true;
+                    if (_syncValue != _value) {
+                        that.config.singleError(node, _errmsg == false ? "两次输入值不一样" : _errmsg);
+                        node.focus();
+                        that.isSuccess = that.isSuccess && false;
+                        return;
+                    }
+                    else {
+                        that.config.singleSuccess(node, _sucmsgg == false ? "验证成功" : _sucmsgg);
+                        that.isSuccess = that.isSuccess || true;
+                    }
                 }
+
             }
         }
 

@@ -111,7 +111,10 @@
         // 对，就这么简单就初始化了。
         ac.form({
             area: "#frm",   // 验证区域，支持标签，id，class，推荐使用id或者class
-            btn: "#btn"     // 触发验证的按钮或者元素，支持标签，id，class，推荐使用id或者class
+            btn: "#btn",     // 触发验证的按钮或者元素，支持标签，id，class，推荐使用id或者class
+            endSuccess: function () {
+                alert("全部验证成功啦！！！！！！");
+            }
         });
 
     </script>
