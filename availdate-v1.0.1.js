@@ -83,8 +83,10 @@
             "idcard": /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/,
             // 时间格式  例如：10:57:10
             "time": /^(\d{1,2})(:)?(\d{1,2})\2(\d{1,2})$/,
+            // 固话
+            "t": /(^[0-9]{3,4}\-[0-9]{3,8}$)|(^[0-9]{3,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}13[0-9]{9}$)/,
             // 手机或者固话
-            "tm": /(^[0-9]{3,4}\-[0-9]{3,8}$)|(^[0-9]{3,8}$)|(^\([0-9]{3,4}\)[0-9]{3,8}$)|(^0{0,1}13[0-9]{9}$)/
+            "tm": /((15)\d{9})|((13)\d{9})|((18)\d{9})|(0[1-9]{2,3}\-?[1-9]{6,7})/i
         },
         tip: {
             "*": "不能为空！",
@@ -107,9 +109,10 @@
             "qq": "请填写QQ号码！",
             "idcard": "请填写身份证号码",
             "time": "请输入时间格式",
+            "t": "请输入固话",
             "tm": "请输入手机或固话"
         }
-    };
+    }, ruleDoms = [];
 
     win.base = {
         extend: function (config, obj) {
@@ -159,6 +162,17 @@
         },
         trim: function (str) {
             return str.replace(/^\s+|\s+$/g, "")
+        },
+        getAllChildrens: function (obj) {
+            var cns = obj.childNodes;
+            if (cns.length == 0) {
+            }
+            else {
+                for (var i = 0; i < cns.length; i++) {
+                    base.getAllChildrens(cns[i]);
+                    ruleDoms.push(cns[i]);
+                }
+            }
         }
     };
 
@@ -213,10 +227,12 @@
             console.warn("页面具有相同的验证区域，默认只对第一个验证区域有用！");
         }
 
-        for (var i = 0; i < _area[0].childNodes.length; i++) {
-            if (base.isFormEle(_area[0].childNodes[i].nodeName.toLocaleLowerCase())) {
-                if (that.isHasRule(_area[0].childNodes[i])) {
-                    areaFormEles.push(_area[0].childNodes[i]);
+        base.getAllChildrens(_area[0]);
+
+        for (var i = 0; i < ruleDoms.length; i++) {
+            if (base.isFormEle(ruleDoms[i].nodeName.toLocaleLowerCase())) {
+                if (that.isHasRule(ruleDoms[i])) {
+                    areaFormEles.push(ruleDoms[i]);
                 }
             }
         }
