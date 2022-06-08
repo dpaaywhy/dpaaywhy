@@ -24,8 +24,8 @@
         ac.form({
             area: "#frm",   // 验证区域，支持标签，id，class，推荐使用id或者class
             btn: "#btn",
-            endSuccess: function () {
-                alert("全部验证成功啦！！！！！！");
+            endSuccess: function (data) {
+                alert("全部验证成功啦！！！！！！" + JSON.stringify(data));
             }
         });
 

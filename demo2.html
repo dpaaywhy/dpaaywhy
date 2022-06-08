@@ -34,8 +34,8 @@
                 // 验证单个成功之后提示信息
                 alert("我自己通过验证了！别人我不知道！");
             },
-            endSuccess: function () {
-                alert("全部验证成功啦！！！！！！");
+            endSuccess: function (data) {
+                alert("全部验证成功啦！！！！！！" + JSON.stringify(data));
             }
         });
 

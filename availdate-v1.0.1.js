@@ -187,7 +187,7 @@
         singleError: function (e, msg) {
             alert(msg);
         },
-        endSuccess: function () { }
+        endSuccess: function (data) { }
     };
 
     var Winu = function (options) {
@@ -227,6 +227,7 @@
             console.warn("页面具有相同的验证区域，默认只对第一个验证区域有用！");
         }
 
+        ruleDoms = [];
         base.getAllChildrens(_area[0]);
 
         for (var i = 0; i < ruleDoms.length; i++) {
@@ -484,7 +485,35 @@
                 that.isSuccess = true;
                 that.config.startCheck();
                 var areaFormEles = that.getFormNodes();
+
+                var serialData = {};
                 for (var i = 0; i < areaFormEles.length; i++) {
+                    var v = areaFormEles[i].value;
+                    var n = areaFormEles[i].name;
+                    var t = areaFormEles[i].type;
+
+                    // 判断是否是checkbox
+                    if (t.toLocaleLowerCase() == "checkbox" || t.toLocaleLowerCase() == "radio") {
+                        if (areaFormEles[i].checked) {
+                            if (serialData[n] != null && serialData != undefined) {
+                                serialData[n] = serialData[n] + "," + v;
+                            }
+                            else {
+                                serialData[n] = v;
+                            }
+                        }
+                    }
+                    else {
+                        if (serialData[n] != null && serialData != undefined) {
+                            serialData[n] = serialData[n] + "," + v;
+                        }
+                        else {
+                            serialData[n] = v;
+                        }
+                    }
+
+
+
                     if (that.isSuccess) {
                         that.core(areaFormEles[i]);
                     }
@@ -493,7 +522,7 @@
                     }
                 }
                 if (that.isSuccess) {
-                    that.config.endSuccess();
+                    that.config.endSuccess(serialData);
                 }
             });
         }
