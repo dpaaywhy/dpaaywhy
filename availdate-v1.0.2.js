@@ -520,6 +520,53 @@
         }
     };
 
+    Winu.prototype.beginCheck = function () {
+        var that = this;
+
+        that.isSuccess = true;
+        that.config.startCheck();
+        var areaFormEles = that.getFormNodes();
+
+        var serialData = {};
+        for (var i = 0; i < areaFormEles.length; i++) {
+            var v = areaFormEles[i].value;
+            var n = areaFormEles[i].name;
+            var t = areaFormEles[i].type;
+
+            // 判断是否是checkbox
+            if (t.toLocaleLowerCase() == "checkbox" || t.toLocaleLowerCase() == "radio") {
+                if (areaFormEles[i].checked) {
+                    if (serialData[n] != null && serialData != undefined) {
+                        serialData[n] = serialData[n] + "," + v;
+                    }
+                    else {
+                        serialData[n] = v;
+                    }
+                }
+            }
+            else {
+                if (serialData[n] != null && serialData != undefined) {
+                    serialData[n] = serialData[n] + "," + v;
+                }
+                else {
+                    serialData[n] = v;
+                }
+            }
+
+
+
+            if (that.isSuccess) {
+                that.core(areaFormEles[i]);
+            }
+            else {
+                break;
+            }
+        }
+        if (that.isSuccess) {
+            that.config.endSuccess(serialData);
+        }
+    }
+
     Winu.prototype.ready = function () {
         var that = this;
 
@@ -530,48 +577,7 @@
         }
         else {
             _btn[0].addEventListener("click", function (e) {
-                that.isSuccess = true;
-                that.config.startCheck();
-                var areaFormEles = that.getFormNodes();
-
-                var serialData = {};
-                for (var i = 0; i < areaFormEles.length; i++) {
-                    var v = areaFormEles[i].value;
-                    var n = areaFormEles[i].name;
-                    var t = areaFormEles[i].type;
-
-                    // 判断是否是checkbox
-                    if (t.toLocaleLowerCase() == "checkbox" || t.toLocaleLowerCase() == "radio") {
-                        if (areaFormEles[i].checked) {
-                            if (serialData[n] != null && serialData != undefined) {
-                                serialData[n] = serialData[n] + "," + v;
-                            }
-                            else {
-                                serialData[n] = v;
-                            }
-                        }
-                    }
-                    else {
-                        if (serialData[n] != null && serialData != undefined) {
-                            serialData[n] = serialData[n] + "," + v;
-                        }
-                        else {
-                            serialData[n] = v;
-                        }
-                    }
-
-
-
-                    if (that.isSuccess) {
-                        that.core(areaFormEles[i]);
-                    }
-                    else {
-                        break;
-                    }
-                }
-                if (that.isSuccess) {
-                    that.config.endSuccess(serialData);
-                }
+                that.beginCheck();
             });
         }
     }
