@@ -227,7 +227,7 @@
     // 默认配置
     var config = {
         area: "body",
-        btn: "",
+        btn: "#winunet",
         startCheck: function () {
         },
         singleSuccess: function (e, msg) {
@@ -235,7 +235,9 @@
         singleError: function (e, msg) {
             alert(msg);
         },
-        endSuccess: function (data) { }
+        endSuccess: function (data) {
+            alert("全部验证成功啦！" + JSON.stringify(data));
+        }
     };
 
     var Winu = function (options) {
