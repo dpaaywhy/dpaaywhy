@@ -574,7 +574,7 @@
 
         var _btn = S(that.config.btn);
         if (_btn.length == 0) {
-            console.error("没有找到触发验证的按钮！");
+            console.warn("没有找到触发验证的按钮，请自动调用原型方法执行验证！");
             return;
         }
         else {
