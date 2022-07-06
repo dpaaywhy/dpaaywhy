@@ -522,7 +522,7 @@
         }
     };
 
-    Winu.prototype.beginCheck = function () {
+    Winu.prototype.beginCheck = function (func) {
         var that = this;
 
         that.isSuccess = true;
@@ -565,7 +565,12 @@
             }
         }
         if (that.isSuccess) {
-            that.config.endSuccess(serialData);
+            if (typeof func == "function") {
+                func();
+            }
+            else {
+                that.config.endSuccess(serialData);
+            }
         }
     }
 
