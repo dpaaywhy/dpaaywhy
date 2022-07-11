@@ -19,6 +19,46 @@
 		this.getNewObj = function (obj) {
 			return $$api.strToJson(JSON.stringify(obj));
 		};
+		this.trim = function (str) {
+			return str.replace(/(^\s*)|(\s*$)/g, '');
+		};
+		this.isNullOrEmpty = function (str) {
+			return (str == null || str == undefined || $$com.trim(str) == "") ? true : false;
+		};
+		this.isNullOrUndefined = function (str) {
+			return (str == null || str == undefined) ? true : false;
+		};
+		this.warn = function (msg) {
+			console.warn(msg);
+		};
+		this.error = function (msg) {
+			console.error(msg);
+		};
+		this.log = function (msg) {
+			console.log(msg);
+		};
+		this.getCommonByTwoArray = function (arr1, arr2) {
+			var arr = [];
+			for (var s in arr1) {
+				for (var x in arr2) {
+					if (arr1[s] == arr2[x]) {
+						arr.push(arr1[s]);
+					}
+				}
+			}
+			return arr;
+		};
+		this.creatArrayByObjectValue = function (obj) {
+			var arr = [];
+			for (var item in obj) {
+				arr.push(obj[item]);
+			}
+		};
+		// 判断是否是表单元素
+		this.isFormElement = function (node) {
+			var formEle = ["input", "select", "textarea"];
+			return formEle.indexOf(node.nodeName.toLocaleLowerCase()) > -1;
+		}
 	};
 	var cmd = new Ext();
 
@@ -26,6 +66,9 @@
 	var defaultOptions = {
 		area: document,
 		btn: "",
+		tip: function (e, msg) {
+			alert(msg);
+		},
 		before: function (form) { },
 		success: function (form, formData) { },
 		error: function (form, errorElement, status) { },
@@ -42,8 +85,8 @@
 		"n6-16": /^\d{6,16}$/,
 		// 字符串类型；
 		"s": /^[\u4E00-\u9FA5\uf900-\ufa2d\w\.\s]+$/,
-		// 6到18位字符串；
-		"s6-18": /^[\u4E00-\u9FA5\uf900-\ufa2d\w\.\s]{6,18}$/,
+		// 6到16位字符串；
+		"s6-16": /^[\u4E00-\u9FA5\uf900-\ufa2d\w\.\s]{6,18}$/,
 		// 验证是否为邮政编码；
 		"p": /^[0-9]{6}$/,
 		// 手机号码格式；
@@ -148,23 +191,215 @@
 		"ename": "请输入正确的英文名称",
 		"pn": "请输入正确的正数",
 		"upn": "请输入正确的负数"
-	};
+	}
+	, defautPropertys = [
+		"data-rule",
+		"data-nullmsg",
+		"data-errmsg",
+		"data-sucmsg",
+		"data-ignore",
+		"data-sync"
+	];
 
 	var Core = function (options) {
 		var o = options || {};
 		this.config = cmd.extend(defaultOptions, o);
 		this.status = "prepare";	// 验证状态，prepare,validating,success,error,complete
 		this.validate_way = "text";	// 验证方式，对非表单元素有左右，默认只对元素文本内容验证
-		this.showMsg = function (e, msg) {
-			alert(msg);
-		};
+
+		if (this.config.btn && cmd.Q(this.config.btn).length > 0) {
+			this.ready();
+		}
 	};
 
-	// 开始验证
-	Core.prototype.begin = function () {
+	// 获取所有需要验证的对象
+	Core.prototype.getValidateObj = function (nodeList) {
+		var arr = [];
+		for (var i = 0; i < nodeList.length; i++) {
+			var attrs = nodeList[i].attributes;
+			if (attrs.length > 0) {
+				for (var j = 0; j < attrs.length; j++) {
+					if (defautPropertys.indexOf(attrs[j].name) > -1) {
+						arr.push(nodeList[i]);
+						break;
+					}
+				}
+			}
+		}
+		return arr;
+	};
+
+	// 获取验证区域集合
+	Core.prototype.getValidateList = function () {
+		var that = this;
+		var config = that.config;
+		// 验证的区域集合
+		var validateList = [];
+
+		if (config.area && cmd.Q(config.area).length > 0) {
+			var areas = cmd.Q(config.area);
+
+			for (var i = 0; i < areas.length; i++) {
+				var childrens = cmd.Q("*", areas[i]);
+				var nodes = that.getValidateObj(childrens);
+				// 将区域和区域对应的验证元素添加到数组集合中
+				validateList.push({
+					area: areas[i],
+					elements: nodes,
+					btn: cmd.Q(config.btn, areas[i])
+				});
+			}
+		}
+		return validateList;
+	};
+
+	// 验证失败执行函数
+	Core.prototype.checkError = function (ele, errmsg, area) {
 		var that = this;
 		var config = that.config;
 
+		that.status = "error";
+		if (typeof config.tip == "function") {
+			config.tip(ele, errmsg);
+		}
+		if (typeof config.error == "function") {
+			config.error(area, ele, that.status);
+		}
+		if (typeof config.complete == "function") {
+			config.complete(area, that.status);
+		}
+		// 设置表单元素获取焦点
+		if (cmd.isFormElement(ele)) {
+			ele.focus();
+		}
 	};
+
+	// 开始正则配对
+	Core.prototype.ruleCheck = function (ele, val, area) {
+		var that = this;
+		var config = that.config;
+
+		var data_rule = ele.getAttribute(defautPropertys[0]);
+		var data_nullmsg = ele.getAttribute(defautPropertys[1]);
+		var data_errmsg = ele.getAttribute(defautPropertys[2]);
+		var data_sucmsg = ele.getAttribute(defautPropertys[3]);
+		var data_ignore = ele.getAttribute(defautPropertys[4]);
+		var data_sync = ele.getAttribute(defautPropertys[5]);
+
+		if (data_rule) {
+			// 第一种情况，如果找到对应的占位符
+			if (defaultRules[data_rule.toString()]) {
+				if (!defaultRules[data_rule.toString()].test(val)) {
+
+					that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()], area);
+					return;
+				}
+				else {
+					that.status = "success";
+				}
+			}
+				// 第二种情况，是否配置范围占位符
+			else if (/(.+)([0-9]+)-([0-9]+)/.test(data_rule)) {
+				var matches = data_rule.match(/(.+)([0-9]+)-([0-9]+)/);
+				// 判断第一个是否是内置标识符
+				if (defaultRules[matches[1].toString()]) {
+					// /^[\w\W]+$/
+					var _reg = defaultRules[matches[1].toString()].toString();
+					var regMatches = _reg.match(/\/\^(.+)\+\$\//);
+
+					var reg = eval("/^" + regMatches[1] + "{" + matches[2] + "," + matches[3] + "}" + "$/");
+					// 验证正则表达式
+					if (!reg.test(val)) {
+						that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()].replace("$1", matches[2]).replace("$2", matches[3]), area);
+						return;
+					}
+					else {
+						that.status = "success";
+					}
+				}
+				else {
+					var reg = eval(data_rule);
+					// 验证正则表达式
+					if (!reg.test(val)) {
+						that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()], area);
+						return;
+					}
+					else {
+						that.status = "success";
+					}
+				}
+			}
+				// 第三种情况，直接当正则表达式匹配
+			else {
+				var reg = eval(data_rule);
+				// 验证正则表达式
+				if (!reg.test(val)) {
+					that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()], area);
+					return;
+				}
+				else {
+					that.status = "success";
+				}
+			}
+		}
+	};
+
+	// 开始验证
+	Core.prototype.begin = function (elements, area) {
+		var that = this;
+		var config = that.config;
+
+		for (var i = 0; i < elements.length; i++) {
+			var node = elements[i];
+			var val = "";
+			if (cmd.isFormElement(node)) {
+				val = node.value;
+			}
+			else {
+				val = that.validate_way == "text" ? cmd.trim(node.innerText) : cmd.trim(node.innerHTML);
+			}
+
+			this.ruleCheck(elements[i], cmd.trim(val), area);
+		}
+	};
+
+	// 开始处理
+	Core.prototype.handle = function (obj) {
+		var that = this;
+		var config = that.config;
+
+		if (obj.btn) {
+			// 绑定事件
+			(obj.btn)[0].addEventListener("click", function () {
+				if (typeof config.before == "function") {
+					// 执行开始验证
+					config.before(obj.area);
+
+					that.begin(obj.elements, obj.area);
+				}
+			}, false);
+		}
+	};
+
+	// 开始验证
+	Core.prototype.ready = function () {
+		var that = this;
+		var config = that.config;
+
+		var list = that.getValidateList();
+
+		for (var i = 0; i < list.length; i++) {
+			var obj = list[i];
+			that.handle(obj);
+		}
+	};
+
+
+	var V = {};
+	V.init = function (options) {
+		return new Core(options);
+	}
+
+	W.V = V;
 
 }(window, document);
