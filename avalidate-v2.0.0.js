@@ -201,11 +201,13 @@
 		"data-sync"
 	];
 
-	var Core = function (options) {
+	var Core = function (options, rules) {
 		var o = options || {};
+		var r = rules || {};
 		this.config = cmd.extend(defaultOptions, o);
 		this.status = "prepare";	// 验证状态，prepare,validating,success,error,complete
 		this.validate_way = "text";	// 验证方式，对非表单元素有左右，默认只对元素文本内容验证
+		this.rules = cmd.extend(defaultRules, r);
 
 		if (this.config.btn && cmd.Q(this.config.btn).length > 0) {
 			this.ready();
@@ -288,8 +290,8 @@
 
 		if (data_rule) {
 			// 第一种情况，如果找到对应的占位符
-			if (defaultRules[data_rule.toString()]) {
-				if (!defaultRules[data_rule.toString()].test(val)) {
+			if (that.rules[data_rule.toString()]) {
+				if (!that.rules[data_rule.toString()].test(val)) {
 
 					that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()], area);
 					return;
@@ -302,9 +304,9 @@
 			else if (/(.+)([0-9]+)-([0-9]+)/.test(data_rule)) {
 				var matches = data_rule.match(/(.+)([0-9]+)-([0-9]+)/);
 				// 判断第一个是否是内置标识符
-				if (defaultRules[matches[1].toString()]) {
+				if (that.rules[matches[1].toString()]) {
 					// /^[\w\W]+$/
-					var _reg = defaultRules[matches[1].toString()].toString();
+					var _reg = that.rules[matches[1].toString()].toString();
 					var regMatches = _reg.match(/\/\^(.+)\+\$\//);
 
 					var reg = eval("/^" + regMatches[1] + "{" + matches[2] + "," + matches[3] + "}" + "$/");
@@ -350,16 +352,18 @@
 		var config = that.config;
 
 		for (var i = 0; i < elements.length; i++) {
-			var node = elements[i];
-			var val = "";
-			if (cmd.isFormElement(node)) {
-				val = node.value;
-			}
-			else {
-				val = that.validate_way == "text" ? cmd.trim(node.innerText) : cmd.trim(node.innerHTML);
-			}
+			if (that.status != "error") {
+				var node = elements[i];
+				var val = "";
+				if (cmd.isFormElement(node)) {
+					val = node.value;
+				}
+				else {
+					val = that.validate_way == "text" ? cmd.trim(node.innerText) : cmd.trim(node.innerHTML);
+				}
 
-			this.ruleCheck(elements[i], cmd.trim(val), area);
+				this.ruleCheck(elements[i], cmd.trim(val), area);
+			}
 		}
 	};
 
@@ -371,13 +375,31 @@
 		if (obj.btn) {
 			// 绑定事件
 			(obj.btn)[0].addEventListener("click", function () {
+				that.status = "prepare";
 				if (typeof config.before == "function") {
 					// 执行开始验证
 					config.before(obj.area);
 
 					that.begin(obj.elements, obj.area);
 				}
+
+				// 成功验证
+				if (that.status == "success") {
+					if (typeof config.success == "function") {
+						// 验证成功
+						config.success(obj.area, {});
+					}
+				}
+
+				// 完成验证
+				if (typeof config.complete == "function") {
+					// 验证成功
+					config.complete(obj.area, that.status);
+				}
 			}, false);
+		}
+		else {
+			// 如果按钮为空，可以主动触发验证
 		}
 	};
 
@@ -394,12 +416,11 @@
 		}
 	};
 
-
 	var V = {};
-	V.init = function (options) {
-		return new Core(options);
-	}
+	V.init = function (options, rules) {
+		return new Core(options, rules);
+	};
+	V.version = "2.0.0";
 
 	W.V = V;
-
 }(window, document);

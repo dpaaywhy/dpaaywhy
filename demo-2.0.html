@@ -13,6 +13,9 @@
         <div>
             姓名：   <input type="text" data-rule="/^\d+$/" data-nullmsg="姓名不能为空" data-errmsg="必须是3到6个字符" data-sucmsg="" data-haved="true" />
         </div>
+        <div>
+            姓名2：   <input type="text" data-rule="*" data-nullmsg="姓名不能为空" data-errmsg="必须是3到6个字符" data-sucmsg="" data-haved="true" />
+        </div>
         <br />
         <br />
         <input type="button" id="btn" value="提交" />
@@ -23,7 +26,9 @@
             btn: "#btn",
             before: function (form) {
             },
-            success: function (form, formData) { },
+            success: function (form, formData) {
+                alert("验证成功了");
+            },
             error: function (form, errorElement, status) { },
             complete: function (form, status) {
             }
