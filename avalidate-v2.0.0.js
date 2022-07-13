@@ -331,7 +331,13 @@
 					}
 				}
 			}
-				// 第三种情况，直接当正则表达式匹配
+				// 第三种情况，非常强大的组合验证，格式()and() ()or()
+			else if (/((.+))[and|or]((.+))/g.test(data_rule)) {
+				// 分割成数组
+				var splitArr = data_rule.split(/and|or/);
+				//alert(splitArr);
+			}
+				// 第四种情况，直接当正则表达式匹配
 			else {
 				var reg = eval(data_rule);
 				// 验证正则表达式
