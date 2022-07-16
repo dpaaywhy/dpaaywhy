@@ -566,7 +566,7 @@
         }
         if (that.isSuccess) {
             if (typeof func == "function") {
-                func();
+                func(serialData);
             }
             else {
                 that.config.endSuccess(serialData);
