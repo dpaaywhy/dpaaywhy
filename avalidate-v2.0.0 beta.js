@@ -74,6 +74,16 @@
         this.isFormElement = function (node) {
             var formEle = ["input", "select", "textarea"];
             return formEle.indexOf(node.nodeName.toLocaleLowerCase()) > -1;
+        },
+        this.split = function (str, reg) {
+            var arr = str.split(reg);
+            var _arr = [];
+            for (var i = 0; i < arr.length; i++) {
+                if (arr[i]) {
+                    _arr.push(arr[i]);
+                }
+            }
+            return _arr;
         }
     };
     var cmd = new Ext();
@@ -292,6 +302,47 @@
         }
     };
 
+    // 返回规则正则表达式和提示信息
+    Core.prototype.getReg = function (data_rule, data_errmsg) {
+        var that = this;
+        var config = that.config;
+
+        var reg = /.*/;
+        var tip = data_errmsg;
+        if (/((.+))((and){1}|(or){1})((.+))/g.test(data_rule) == false) {
+            // 第一种情况，如果找到对应的占位符
+            if (that.rules[data_rule.toString()]) {
+                reg = that.rules[data_rule.toString()];
+                tip = data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()];
+            }
+                // 第二种情况，是否配置范围占位符
+            else if (/(.+)([0-9]+)-([0-9]+)/.test(data_rule)) {
+                var matches = data_rule.match(/(.+)([0-9]+)-([0-9]+)/);
+                // 判断第一个是否是内置标识符
+                if (that.rules[matches[1].toString()]) {
+                    var _reg = that.rules[matches[1].toString()].toString();
+                    var regMatches = _reg.match(/\/\^(.+)\+\$\//);
+
+                    reg = eval("/^" + regMatches[1] + "{" + matches[2] + "," + matches[3] + "}" + "$/");
+                    tip = data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()].replace("$1", matches[2]).replace("$2", matches[3]);
+                }
+                else {
+                    reg = eval(data_rule);
+                    tip = data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()];
+                }
+            }
+                // 第三种情况，直接当正则表达式匹配
+            else {
+                reg = eval(data_rule);
+                tip = data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()];
+            }
+        }
+        return {
+            reg: reg,
+            tip: tip
+        }
+    }
+
     // 开始正则配对
     Core.prototype.ruleCheck = function (ele, val, area) {
         var that = this;
@@ -319,65 +370,48 @@
         }
 
         if (data_rule) {
-            // 第一种情况，如果找到对应的占位符
-            if (that.rules[data_rule.toString()]) {
-                if (!that.rules[data_rule.toString()].test(val)) {
 
-                    that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()], area);
-                    return;
-                }
-                else {
-                    that.status = "success";
-                }
-            }
-                // 第二种情况，是否配置范围占位符
-            else if (/(.+)([0-9]+)-([0-9]+)/.test(data_rule)) {
-                var matches = data_rule.match(/(.+)([0-9]+)-([0-9]+)/);
-                // 判断第一个是否是内置标识符
-                if (that.rules[matches[1].toString()]) {
-                    // /^[\w\W]+$/
-                    var _reg = that.rules[matches[1].toString()].toString();
-                    var regMatches = _reg.match(/\/\^(.+)\+\$\//);
+            var regObj = that.getReg(data_rule, data_errmsg);
 
-                    var reg = eval("/^" + regMatches[1] + "{" + matches[2] + "," + matches[3] + "}" + "$/");
-                    // 验证正则表达式
-                    if (!reg.test(val)) {
-                        that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()].replace("$1", matches[2]).replace("$2", matches[3]), area);
-                        return;
-                    }
-                    else {
-                        that.status = "success";
-                    }
-                }
-                else {
-                    var reg = eval(data_rule);
-                    // 验证正则表达式
-                    if (!reg.test(val)) {
-                        that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()], area);
-                        return;
-                    }
-                    else {
-                        that.status = "success";
-                    }
-                }
-            }
-                // 第三种情况，非常强大的组合验证，格式()and() ()or()
-            else if (/((.+))[and|or]((.+))/g.test(data_rule)) {
+            // 第四种情况，非常强大的组合验证，格式()and() ()or()
+            if (/((.+))((and){1}|(or){1})((.+))/g.test(data_rule)) {
                 // 分割成数组
                 var splitArr = data_rule.split(/and|or/);
-                //alert(splitArr);
-            }
-                // 第四种情况，直接当正则表达式匹配
-            else {
-                var reg = eval(data_rule);
-                // 验证正则表达式
-                if (!reg.test(val)) {
-                    that.checkError(ele, data_errmsg ? data_errmsg : defaultRuleTips[data_rule.toString()], area);
+                var _regAndOr = data_rule;
+                var _regArr = [];
+                for (var i = 0; i < splitArr.length; i++) {
+                    var _rb = that.getReg(splitArr[i].substring(1, splitArr[i].length - 1), data_errmsg);
+                    _regArr.push(_rb.reg);
+                    _regAndOr = _regAndOr.replace(splitArr[i], ",");
+                }
+                var _regAnd_Or_Arr = cmd.split(_regAndOr, ",");
+
+                var tj = "";
+                for (var i = 0; i < _regArr.length; i++) {
+                    if (i < _regArr.length - 1) {
+                        tj += "(" + _regArr[i] + ".test(val)" + ")" + (_regAnd_Or_Arr[i] == "or" ? "||" : "&&");
+                    }
+                    else {
+                        tj += "(" + _regArr[i] + ".test(val)" + ")";
+                    }
+                }
+                var result = eval(tj);
+                if (!result) {
+                    that.checkError(ele, regObj.tip, area);
                     return;
                 }
                 else {
                     that.status = "success";
                 }
+            }
+
+            // 验证正则表达式
+            if (!regObj.reg.test(val)) {
+                that.checkError(ele, regObj.tip, area);
+                return;
+            }
+            else {
+                that.status = "success";
             }
         }
         else {
@@ -459,7 +493,7 @@
     V.init = function (options, rules) {
         return new Core(options, rules);
     };
-    V.version = "2.0.0";
+    V.version = "2.0.0 Beta";
 
     W.V = V;
 }(window, document);
