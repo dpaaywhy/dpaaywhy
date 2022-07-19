@@ -373,7 +373,7 @@
 
             var regObj = that.getReg(data_rule, data_errmsg);
 
-            // 第四种情况，非常强大的组合验证，格式()and() ()or()
+            // 第四种情况，非常强大的组合验证，格式()and() ()or()，支持2个或者两个以上
             if (/((.+))((and){1}|(or){1})((.+))/g.test(data_rule)) {
                 // 分割成数组
                 var splitArr = data_rule.split(/and|or/);
@@ -386,16 +386,16 @@
                 }
                 var _regAnd_Or_Arr = cmd.split(_regAndOr, ",");
 
-                var tj = "";
+                var condition = "";
                 for (var i = 0; i < _regArr.length; i++) {
                     if (i < _regArr.length - 1) {
-                        tj += "(" + _regArr[i] + ".test(val)" + ")" + (_regAnd_Or_Arr[i] == "or" ? "||" : "&&");
+                        condition += "(" + _regArr[i] + ".test(val)" + ")" + (_regAnd_Or_Arr[i] == "or" ? "||" : "&&");
                     }
                     else {
-                        tj += "(" + _regArr[i] + ".test(val)" + ")";
+                        condition += "(" + _regArr[i] + ".test(val)" + ")";
                     }
                 }
-                var result = eval(tj);
+                var result = eval(condition);
                 if (!result) {
                     that.checkError(ele, regObj.tip, area);
                     return;
