@@ -1,5 +1,5 @@
 ﻿/*
- * avalidate.js 2.0.0 Beta 重构版本（框架目前未完善，不建议在生产环境中使用）
+ * avalidate.js 2.0.0 Beta 重构版本（框架目前初步完善）
 
  * #################################################
  * 框架特性：
@@ -84,6 +84,15 @@
                 }
             }
             return _arr;
+        },
+        this.formItemType = function (node) {
+            // 判断是否是select，checkbox，radio
+            if (node.nodeName.toLocaleLowerCase() == "select") {
+                return "select";
+            }
+            if (node.getAttribute("type") == "radio" || node.getAttribute("type") == "checkbox") {
+                return node.getAttribute("type").toLocaleLowerCase();
+            }
         }
     };
     var cmd = new Ext();
@@ -368,6 +377,81 @@
                 data_rule = syncObj.getAttribute(defautPropertys[0]);
             }
         }
+
+        // 判断是否是select，checkbox，radio
+        //1、select判断是否是默认值即可
+        if (cmd.formItemType(ele) == "select") {
+            if (data_rule) {
+                // 判断是否等于 "*" 等于代表value非等于 空字符串的
+                if (data_rule == "*" && ele.value == "") {
+                    that.checkError(ele, data_errmsg ? data_errmsg : "请选择", area);
+                    return;
+                }
+                    // 判断是否等于默认值
+                else if (data_rule == ele.value) {
+                    that.checkError(ele, data_errmsg ? data_errmsg : "请选择", area);
+                    return;
+                }
+                else {
+                    this.status == "success";
+                }
+            }
+            else {
+                this.status == "success";
+            }
+            return;
+        }
+
+        // 判断是否是radio，radio要找name属性相同的
+        if (cmd.formItemType(ele) == "radio") {
+            var radio_name = ele.getAttribute("name");
+            if (data_rule && radio_name) {
+                var radios = cmd.Q("input[name='" + radio_name + "'][type='radio']");
+                var radio_ischeck = false;
+                for (var radio in radios) {
+                    if (radios[radio].checked) {
+                        radio_ischeck = true;
+                        break;
+                    }
+                }
+                if (!radio_ischeck) {
+                    that.checkError(ele, data_errmsg ? data_errmsg : "请选择", area);
+                    return;
+                }
+            }
+            return;
+        }
+
+        // 判断是否是checkbox，checkbox要找name属性相同的，并且至少选择一个
+        if (cmd.formItemType(ele) == "checkbox") {
+            var checkbox_name = ele.getAttribute("name");
+            if (data_rule && checkbox_name) {
+                var checkboxs = cmd.Q("input[name='" + checkbox_name + "'][type='checkbox']");
+                var checkbox_check_size = 0;
+                for (var checkbox in checkboxs) {
+                    if (checkboxs[checkbox].checked) {
+                        checkbox_check_size += 1;
+                    }
+                }
+
+                // 可以匹配最多最少
+                if (/(\*)([0-9]+)-([0-9]+)/.test(data_rule)) {
+                    var matches = data_rule.match(/(\*)([0-9]+)-([0-9]+)/);
+
+                    if (eval("checkbox_check_size<" + matches[2] + "||checkbox_check_size>" + matches[3])) {
+                        that.checkError(ele, data_errmsg ? data_errmsg : "只能选择" + matches[2] + "项到" + matches[3] + "项", area);
+                        return;
+                    }
+                }
+
+                if (checkbox_check_size == 0) {
+                    that.checkError(ele, data_errmsg ? data_errmsg : "请至少选择一个", area);
+                    return;
+                }
+            }
+            return;
+        }
+
 
         if (data_rule) {
 
