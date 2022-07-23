@@ -1,5 +1,5 @@
 ﻿/*
- * avalidate.js 2.0.0 Beta 重构版本（框架目前初步完善）
+ * avalidate.js 2.0.0 Beta 重构版本（框架目前基本完善，可以在项目中使用）
 
  * #################################################
  * 框架特性：
@@ -93,6 +93,71 @@
             if (node.getAttribute("type") == "radio" || node.getAttribute("type") == "checkbox") {
                 return node.getAttribute("type").toLocaleLowerCase();
             }
+        },
+        // 将验证表单生成json对象，有name字段优先，没有name字段，用id
+        this.getRuleFormJsonSerialize = function (area, elements, noFormValue) {
+            var obj = {};
+            for (var i = 0; i < elements.length; i++) {
+                var objName = "winu";
+                var objValue = "";
+
+                // 判断是否是表单元素
+                if (this.isFormElement(elements[i])) {
+                    // 判断是否是checkbox，select，radio
+                    var formType = this.formItemType(elements[i]);
+                    switch (formType) {
+                        case "select":
+                            var _name = elements[i].getAttribute("name");
+                            if (_name) {
+                                obj[_name] = elements[i].value;
+                            }
+                            break;
+                        case "radio":
+                            var _name = elements[i].getAttribute("name");
+                            if (_name) {
+                                var radios = this.Q("input[type='radio'][name='" + _name + "']", area);
+                                for (var j = 0; j < radios.length; j++) {
+                                    if (radios[j].checked) {
+                                        obj[_name] = radios[j].value;
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        case "checkbox":
+                            var _name = elements[i].getAttribute("name");
+                            if (_name) {
+                                var checkVals = "";
+                                var checkboxs = this.Q("input[type='checkbox'][name='" + _name + "']", area);
+                                for (var j = 0; j < checkboxs.length; j++) {
+                                    if (checkboxs[j].checked) {
+                                        checkVals += checkboxs[j].value + ",";
+                                    }
+                                }
+                                obj[_name] = checkVals;
+                            }
+                            break;
+                    }
+                    if (elements[i].nodeName.toLocaleLowerCase() == "text") {
+                        var _name = elements[i].getAttribute("name");
+                        if (_name) {
+                            obj[_name] = elements[i].value;
+                        }
+                    }
+                }
+                else {
+                    var _name = elements[i].getAttribute("name");
+                    if (_name) {
+                        if (noFormValue == "text") {
+                            obj[_name] = elements[i].innerText;
+                        }
+                        else {
+                            obj[_name] = elements[i].innerHTML;
+                        }
+                    }
+                }
+            }
+            return obj;
         }
     };
     var cmd = new Ext();
@@ -543,8 +608,10 @@
                 // 成功验证
                 if (that.status == "success") {
                     if (typeof config.success == "function") {
+                        // 生成所有验证表单键值对
+                        var formJson = cmd.getRuleFormJsonSerialize(obj.area, obj.elements, that.validate_way);
                         // 验证成功
-                        config.success(obj.area, {});
+                        config.success(obj.area, formJson);
                     }
                 }
 
@@ -577,7 +644,7 @@
     V.init = function (options, rules) {
         return new Core(options, rules);
     };
-    V.version = "2.0.0 Beta";
+    V.version = "2.0.0 RC";
 
     W.V = V;
 }(window, document);
