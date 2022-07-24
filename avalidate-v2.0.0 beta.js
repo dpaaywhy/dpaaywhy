@@ -23,7 +23,7 @@
     var Ext = function () {
         this.Q = function (cssSelector, parent) {
             parent = parent ? parent : D;
-            return parent.querySelectorAll(cssSelector);
+            return parent.querySelectorAll(cssSelector ? cssSelector : "." + "www_winu_net");
         };
         this.extend = function (baseObj, extObj) {
             var inheritObj = baseObj;
@@ -137,12 +137,12 @@
                                 obj[_name] = checkVals;
                             }
                             break;
-                    }
-                    if (elements[i].nodeName.toLocaleLowerCase() == "text") {
-                        var _name = elements[i].getAttribute("name");
-                        if (_name) {
-                            obj[_name] = elements[i].value;
-                        }
+                        default:
+                            var _name = elements[i].getAttribute("name");
+                            if (_name) {
+                                obj[_name] = elements[i].value;
+                            }
+                            break;
                     }
                 }
                 else {
@@ -589,6 +589,36 @@
         }
     };
 
+    // 开始触发
+    Core.prototype.start = function (obj) {
+        var that = this;
+        var config = that.config;
+
+        that.status = "prepare";
+        if (typeof config.before == "function") {
+            // 执行开始验证
+            config.before(obj.area);
+
+            that.begin(obj.elements, obj.area);
+        }
+
+        // 成功验证
+        if (that.status == "success") {
+            if (typeof config.success == "function") {
+                // 生成所有验证表单键值对
+                var formJson = cmd.getRuleFormJsonSerialize(obj.area, obj.elements, that.validate_way);
+                // 验证成功
+                config.success(obj.area, formJson);
+            }
+        }
+
+        // 完成验证
+        if (typeof config.complete == "function") {
+            // 验证成功
+            config.complete(obj.area, that.status);
+        }
+    };
+
     // 开始处理
     Core.prototype.handle = function (obj) {
         var that = this;
@@ -597,29 +627,7 @@
         if (obj.btn) {
             // 绑定事件
             (obj.btn)[0].addEventListener("click", function () {
-                that.status = "prepare";
-                if (typeof config.before == "function") {
-                    // 执行开始验证
-                    config.before(obj.area);
-
-                    that.begin(obj.elements, obj.area);
-                }
-
-                // 成功验证
-                if (that.status == "success") {
-                    if (typeof config.success == "function") {
-                        // 生成所有验证表单键值对
-                        var formJson = cmd.getRuleFormJsonSerialize(obj.area, obj.elements, that.validate_way);
-                        // 验证成功
-                        config.success(obj.area, formJson);
-                    }
-                }
-
-                // 完成验证
-                if (typeof config.complete == "function") {
-                    // 验证成功
-                    config.complete(obj.area, that.status);
-                }
+                that.start(obj);
             }, false);
         }
         else {
@@ -639,6 +647,19 @@
             that.handle(obj);
         }
     };
+
+    // 主动触发
+    Core.prototype.trigger = function () {
+        var that = this;
+        var config = that.config;
+
+        var list = that.getValidateList();
+
+        for (var i = 0; i < list.length; i++) {
+            var obj = list[i];
+            that.start(obj);
+        }
+    }
 
     var V = {};
     V.init = function (options, rules) {
